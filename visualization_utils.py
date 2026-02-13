@@ -12,6 +12,11 @@ import matplotlib.patches as mpatches
 from matplotlib import colors as mcolors
 import geopandas as gpd
 
+# Default figure sizes and coordinate limits for British National Grid
+DEFAULT_FIGSIZE = (7, 10)
+BNG_XLIM = (-200000, 664000)
+BNG_YLIM = (0, 1225000)
+
 
 def plot_bedrock_polygons(bedrock_gdf, output_path="paperplots/bedrock_polygons.png"):
     """
@@ -24,15 +29,15 @@ def plot_bedrock_polygons(bedrock_gdf, output_path="paperplots/bedrock_polygons.
     output_path : str
         Output file path
     """
-    fig, ax = plt.subplots(figsize=(7, 10))
+    fig, ax = plt.subplots(figsize=DEFAULT_FIGSIZE)
     
     bedrock_gdf.plot(ax=ax, facecolor='lightgray', edgecolor='black', 
                      linewidth=0.2)
     
     ax.set_xlabel('Easting (metres BNG)')
     ax.set_ylabel('Northing (metres BNG)')
-    ax.set_xlim(-200000, 664000)
-    ax.set_ylim(0, 1225000)
+    ax.set_xlim(BNG_XLIM)
+    ax.set_ylim(BNG_YLIM)
     
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
@@ -54,7 +59,7 @@ def plot_samples_with_bedrock(mapdat, bedrock_gdf,
     output_path : str
         Output file path
     """
-    fig, ax = plt.subplots(figsize=(7, 10))
+    fig, ax = plt.subplots(figsize=DEFAULT_FIGSIZE)
     
     # Plot samples
     ax.scatter(mapdat['Easting_BNG'], mapdat['Northing_BNG'], 
@@ -65,8 +70,8 @@ def plot_samples_with_bedrock(mapdat, bedrock_gdf,
     
     ax.set_xlabel('Easting (metres BNG)')
     ax.set_ylabel('Northing (metres BNG)')
-    ax.set_xlim(-200000, 664000)
-    ax.set_ylim(0, 1225000)
+    ax.set_xlim(BNG_XLIM)
+    ax.set_ylim(BNG_YLIM)
     
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
@@ -169,7 +174,7 @@ def plot_prediction_map(preds_df, color_column='color',
     output_path : str
         Output file path
     """
-    fig, ax = plt.subplots(figsize=(7, 10))
+    fig, ax = plt.subplots(figsize=DEFAULT_FIGSIZE)
     
     ax.scatter(preds_df['x'], preds_df['y'], 
                c=preds_df[color_column], s=0.5, 
@@ -177,8 +182,8 @@ def plot_prediction_map(preds_df, color_column='color',
     
     ax.set_xlabel('Easting (metres BNG)')
     ax.set_ylabel('Northing (metres BNG)')
-    ax.set_xlim(-200000, 664000)
-    ax.set_ylim(0, 1225000)
+    ax.set_xlim(BNG_XLIM)
+    ax.set_ylim(BNG_YLIM)
     ax.set_aspect('equal')
     
     plt.tight_layout()
@@ -201,15 +206,15 @@ def plot_polygon_composition_map(bedrock_gdf, color_column,
     output_path : str
         Output file path
     """
-    fig, ax = plt.subplots(figsize=(7, 10))
+    fig, ax = plt.subplots(figsize=DEFAULT_FIGSIZE)
     
     bedrock_gdf.plot(ax=ax, color=bedrock_gdf[color_column], 
                      edgecolor='none')
     
     ax.set_xlabel('Easting (metres BNG)')
     ax.set_ylabel('Northing (metres BNG)')
-    ax.set_xlim(-200000, 664000)
-    ax.set_ylim(0, 1225000)
+    ax.set_xlim(BNG_XLIM)
+    ax.set_ylim(BNG_YLIM)
     
     plt.tight_layout()
     plt.savefig(output_path, dpi=300, bbox_inches='tight')

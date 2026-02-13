@@ -35,7 +35,9 @@ def check_imports(filepath):
             for alias in node.names:
                 imports.append(alias.name)
         elif isinstance(node, ast.ImportFrom):
-            imports.append(node.module)
+            # ImportFrom can have None module for relative imports
+            if node.module:
+                imports.append(node.module)
     
     return list(set(imports))
 

@@ -302,6 +302,10 @@ def extract_terrain_patches(mapdat, elevation_path, image_dim, image_res, n_core
     """
     Extract sample-centered terrain image patches.
     
+    NOTE: This function uses nested loops for sampling which may be slow for large datasets.
+    For production use with large datasets, consider using rasterio's windowed reading
+    or batch coordinate sampling for better performance.
+    
     Parameters:
     -----------
     mapdat : pd.DataFrame
@@ -336,7 +340,7 @@ def extract_terrain_patches(mapdat, elevation_path, image_dim, image_res, n_core
             
             center_x, center_y = row['Easting_BNG'], row['Northing_BNG']
             
-            # Extract patch
+            # Extract patch - using individual sampling (consider batching for better performance)
             for ix, dx in enumerate(offsets):
                 for iy, dy in enumerate(offsets):
                     x, y = center_x + dx, center_y + dy
@@ -582,6 +586,11 @@ def evaluate_model(model, x_test, y_test, comp_elements, output_dir="paperplots"
     # Get predictions (mean of distribution)
     preds = model(x_test).mean().numpy()
     
+    # Calculate dynamic axis limits based on data range
+    y_min = min(y_test.min(), preds.min())
+    y_max = max(y_test.max(), preds.max())
+    axis_lim = (y_min - 0.5, y_max + 0.5)
+    
     # Calculate metrics for each element
     for i, elem in enumerate(comp_elements):
         elem_short = elem.replace('2O3', '').replace('2O', '').replace('O', '')
@@ -597,12 +606,12 @@ def evaluate_model(model, x_test, y_test, comp_elements, output_dir="paperplots"
         # Plot observed vs predicted
         plt.figure(figsize=(6, 6))
         plt.scatter(obs, pred, alpha=0.3, s=10)
-        plt.plot([-4, 3], [-4, 3], 'k--', alpha=0.5)
+        plt.plot(axis_lim, axis_lim, 'k--', alpha=0.5)
         plt.xlabel('Observed (centered log-ratio)')
         plt.ylabel('Predicted (centered log-ratio)')
         plt.title(f'{elem_short}: R² = {r2:.2f}, RMSE = {rmse:.2f}')
-        plt.xlim(-4, 3)
-        plt.ylim(-4, 3)
+        plt.xlim(axis_lim)
+        plt.ylim(axis_lim)
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
         plt.savefig(f"{output_dir}/{elem}_BNN_mean_holdout.png", dpi=300)
